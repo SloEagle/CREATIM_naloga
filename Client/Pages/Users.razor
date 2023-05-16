@@ -1,0 +1,103 @@
+﻿@page "/users"
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<h3>Users</h3>
+
+<div class="header">
+    <div class="col">Name</div>
+    <div class="col">E-Mail</div>
+    <div class="col">Phone number</div>
+    <div class="col">Bussiness</div>
+    <div class="col">Tax number</div>
+    <div class="col">Group</div>
+    <div class="col">SMS</div>
+    <div class="col"></div>
+</div>
+
+@if(UserService.Users == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+    @foreach(var user in UserService.Users)
+    {
+        <div class="row">
+            <div class="col">
+                @user.Name
+            </div>
+            <div class="col">
+                @user.Email
+            </div>
+            <div class="col">
+                @user.PhoneNumber
+            </div>
+            <div class="col">
+                @user.Bussiness
+            </div>
+            <div class="col">
+                @user.TaxNumber
+            </div>
+            <div class="col">
+                @if (@user.Group == null)
+                {
+                    @user.Group
+                }
+                else
+                {
+                    @user.Group.Name
+                }
+            </div>
+            <div class="col">
+                <button class="btn btn-primary" @onclick="(() => SendSMS())">
+                    <i class="oi oi-envelope-open"></i>
+                </button>
+            </div>
+            <div class="col">
+                <button class="btn btn-secondary" @onclick="(() => EditUser(user.Id))">
+                    <i class="oi oi-pencil"></i>
+                </button>
+                <button class="btn btn-secondary" @onclick="(() => DeleteUser(user))">
+                    <i class="oi oi-trash"></i>
+                </button>
+            </div>
+        </div>
+    }
+
+    <button type="button" class="btn btn-primary" @onclick="AddUser">
+        <i class="oi oi-plus"></i> Add user
+    </button>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await UserService.GetUsers();
+    }
+
+    private void EditUser(int id)
+    {
+        NavigationManager.NavigateTo($"/user/{id}");
+    }
+
+    private async Task DeleteUser(CREATIM_naloga.Shared.Models.User user)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really want to delete user {user.Name}?");
+        if (confirmed)
+        {
+            await UserService.DeleteUser(user.Id);
+        }
+    }
+
+    private void AddUser()
+    {
+        NavigationManager.NavigateTo("/user/-1");
+    }
+
+    private async Task SendSMS()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", $"SMS sent.");
+    }
+}

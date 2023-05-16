@@ -1,0 +1,68 @@
+﻿@page "/groups"
+@inject IGroupService GroupService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<h3>Groups</h3>
+
+<div class="header">
+    <div class="col">Name</div>
+    <div class="col">SMS</div>
+    <div class="col"></div>
+</div>
+
+@if (GroupService.Groups == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+    @foreach (var group in GroupService.Groups)
+    {
+        <div class="row">
+            <div class="col">
+                @group.Name
+            </div>
+            <div class="col">
+                <button class="btn btn-primary" @onclick="(() => SendSMS())">
+                    <i class="oi oi-envelope-open"></i>
+                </button>
+            </div>
+            <div class="col">
+                <button class="btn btn-secondary" @onclick="(() => EditGroup(group.Id))">
+                    <i class="oi oi-pencil"></i>
+                </button>
+                <button class="btn btn-secondary" @onclick="(() => DeleteGroup(group))">
+                    <i class="oi oi-trash"></i>
+                </button>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await GroupService.GetGroups();
+    }
+
+    private void EditGroup(int id)
+    {
+        NavigationManager.NavigateTo($"/group/{id}");
+    }
+
+    private async Task DeleteGroup(Group group)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really want to delete user {group.Name}?");
+        if (confirmed)
+        {
+            await GroupService.DeleteGroup(group.Id);
+        }
+    }
+
+    private async Task SendSMS()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", $"SMS sent.");
+    }
+}
+
