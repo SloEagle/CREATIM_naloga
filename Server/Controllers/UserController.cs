@@ -47,7 +47,7 @@ namespace CREATIM_naloga.Server.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult<ServiceResponse<List<User>>>> DeleteUser(int id)
         {
-            var result = _userService.DeleteUser(id);
+            var result = await _userService.DeleteUser(id);
             return Ok(result);
         }
     }
