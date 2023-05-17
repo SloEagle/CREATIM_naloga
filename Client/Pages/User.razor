@@ -20,27 +20,22 @@ else
             <div class="mb-0">
                 <label for="name">Name</label>
                 <InputText id="name" @bind-Value="UserService.User.Name" class="form-control"></InputText>
-                <ValidationMessage For="@(() => UserService.User.Name)"/>
             </div>
             <div class="mb-0">
                 <label for="email">E-Mail</label>
                 <InputText id="email" @bind-Value="UserService.User.Email" class="form-control"></InputText>
-                <ValidationMessage For="@(() => UserService.User.Email)" />
             </div>
             <div class="mb-0">
                 <label for="phone">Phone number</label>
                 <InputText id="phone" @bind-Value="UserService.User.PhoneNumber" class="form-control"></InputText>
-                <ValidationMessage For="@(() => UserService.User.PhoneNumber)" />
             </div>
             <div class="form-check">
                 <label for="bussiness">Bussiness</label>
                 <InputCheckbox id="bussiness" @bind-Value="UserService.User.Bussiness" class="form-check-input"></InputCheckbox>
-                <ValidationMessage For="@(() => UserService.User.Bussiness)" />
             </div>
             <div class="mb-0">
                 <label for="tax">Tax number</label>
                 <InputText id="tax" @bind-Value="UserService.User.TaxNumber" class="form-control"></InputText>
-                <ValidationMessage For="@(() => UserService.User.TaxNumber)" />
             </div>
             <div class="mb-0">
                 <label for="group">Group</label>
@@ -50,7 +45,6 @@ else
                         <option value="@group.Id">@group.Name</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="@(() => UserService.User.Group)" />
             </div>
         </div>
 
@@ -60,6 +54,7 @@ else
         <button type="button" class="btn btn-primary" @onclick="SendSMSTest">
             Send SMS (provider testing)
         </button>
+        <ValidationSummary />
     </EditForm>
 
     <br />
@@ -80,6 +75,8 @@ else
     public string SmsMessage { get; set; } = "Input SMS body text here...";
     public string SmsFrom { get; set; } = "Send from...";
     SmsInput smsInput { get; set; } = new SmsInput();
+
+    InputText taxField { get; set; } = new InputText();
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,7 +99,7 @@ else
         try
         {
             if (Id <= 0)
-        {
+            {
                 await UserService.AddUser(UserService.User);
 
                 Logger.LogInformation("User added.");
