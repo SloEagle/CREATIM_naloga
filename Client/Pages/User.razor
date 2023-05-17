@@ -3,6 +3,7 @@
 @inject IGroupService GroupService
 @inject ISmsService SmsService
 @inject NavigationManager NavigationManager
+@inject ILogger<User> Logger
 
 <h3>User</h3>
 
@@ -55,16 +56,18 @@ else
         <button type="submit" class="btn btn-primary" @onclick="UpdateUser">
             <i class="oi oi-plus"></i> Save
         </button>
+        <button type="button" class="btn btn-primary" @onclick="SendSMS">
+            Send SMS through
+            @if (@SmsService.Provider == null)
+            {
+                <span>Loading...</span>
+            }
+            else
+            {
+                @SmsService.Provider.Name
+            }
+        </button>
     </EditForm>
-
-    @if(SmsService.Provider == null)
-    {
-        <span>Loading...</span>
-    }
-    else
-    {
-                <span>Top provider : @SmsService.Provider.Name</span>
-    }
 }
 
 @code {
@@ -73,24 +76,49 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await UserService.GetUser(Id);
-        await GroupService.GetGroups();
-
-        await SmsService.GetProvider();
+        try
+        {
+            await UserService.GetUser(Id);
+            await GroupService.GetGroups();
+            await SmsService.GetProvider();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+        }
     }
 
     private async Task UpdateUser()
     {
-        if(Id == 0)
+        try
         {
-            await UserService.AddUser(UserService.User);
-        }
-        else
-        {
-            await UserService.UpdateUser(UserService.User);
-        }
+            if (Id == 0)
+            {
+                await UserService.AddUser(UserService.User);
+            }
+            else
+            {
+                await UserService.UpdateUser(UserService.User);
+            }
 
-        NavigationManager.NavigateTo("/users");
+            NavigationManager.NavigateTo("/users");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+        }
+    }
+
+    private async Task SendSMS()
+    {
+        var sms = new Sms()
+            {
+                To = "Jan",
+                From = "Peter",
+                Body = "Lorem Ipsum"
+            };
+
+        await SmsService.SendSMS(sms);
     }
 }
 

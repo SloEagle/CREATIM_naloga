@@ -2,6 +2,7 @@
 @inject IUserService UserService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject ILogger<Users> Logger
 
 <h3>Users</h3>
 
@@ -74,7 +75,14 @@ else
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await UserService.GetUsers();
+        try
+        {
+            await UserService.GetUsers();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+        }
     }
 
     private void EditUser(int id)
@@ -84,10 +92,17 @@ else
 
     private async Task DeleteUser(CREATIM_naloga.Shared.Models.User user)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really want to delete user {user.Name}?");
-        if (confirmed)
+        try
         {
-            await UserService.DeleteUser(user.Id);
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really want to delete user {user.Name}?");
+            if (confirmed)
+            {
+                await UserService.DeleteUser(user.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
         }
     }
 

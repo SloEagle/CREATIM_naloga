@@ -12,7 +12,8 @@ namespace CREATIM_naloga.Shared.Models
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
-        public int Position { get; set; } = 0;
+        public string SID { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
         public int SentCount { get; set; } = 0;
     }
 }

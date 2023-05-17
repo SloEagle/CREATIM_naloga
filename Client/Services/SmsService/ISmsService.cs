@@ -4,5 +4,7 @@
     {
         Provider Provider { get; set; }
         Task GetProvider();
+        Task SendSMS(Sms sms);
+        Task SendGroupSMS(int groupId, Sms sms);
     }
 }

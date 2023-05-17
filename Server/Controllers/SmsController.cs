@@ -19,7 +19,21 @@ namespace CREATIM_naloga.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<Provider>> GetProvider()
         {
-            var result = await _smsService.GetTopProvider();
+            var result = await _smsService.GetProvider();
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ServiceResponse<string>>> SendSMS(Sms sms)
+        {
+            var result = await _smsService.SendSMS(sms);
+            return Ok(result);
+        }
+
+        [HttpPost("group/{groupId}")]
+        public async Task<ActionResult<ServiceResponse<string>>> SendSMS(int groupId, Sms sms)
+        {
+            var result = await _smsService.SendGroupSMS(groupId, sms);
             return Ok(result);
         }
     }

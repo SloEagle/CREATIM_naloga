@@ -4,8 +4,9 @@ namespace CREATIM_naloga.Server.Services.SmsService
 {
     public interface ISmsService
     {
-        Task SendSMS();
-        Task SendGroupSMS(int groupId);
-        Task<Provider> GetTopProvider();
+        Sms Sms { get; set; }
+        Task<Provider> GetProvider();
+        Task<ServiceResponse<string>> SendSMS(Sms sms);
+        Task<ServiceResponse<string>> SendGroupSMS(int groupId, Sms sms);
     }
 }

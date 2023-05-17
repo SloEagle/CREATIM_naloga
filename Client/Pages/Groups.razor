@@ -2,6 +2,7 @@
 @inject IGroupService GroupService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject Logger<Groups> Logger
 
 <h3>Groups</h3>
 
@@ -43,7 +44,14 @@ else
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await GroupService.GetGroups();
+        try
+        {
+            await GroupService.GetGroups();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+        }
     }
 
     private void EditGroup(int id)
@@ -53,10 +61,17 @@ else
 
     private async Task DeleteGroup(Group group)
     {
-        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really want to delete user {group.Name}?");
-        if (confirmed)
+        try
         {
-            await GroupService.DeleteGroup(group.Id);
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Do you really want to delete user {group.Name}?");
+            if (confirmed)
+            {
+                await GroupService.DeleteGroup(group.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
         }
     }
 
