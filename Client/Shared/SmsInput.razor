@@ -1,0 +1,15 @@
+﻿
+<h3>SMS:</h3>
+<div class="row">
+    <label for="from">From:</label>
+    <InputText id="from" @bind-Value="MessageFrom"></InputText>
+    <label for="sms">Body:</label>
+    <InputTextArea id="sms" @bind-Value="MessageBody" style="height:300px"></InputTextArea>
+</div>
+
+@code {
+    [Parameter]
+    public string MessageBody { get; set; } = string.Empty;
+    [Parameter]
+    public string MessageFrom { get; set; } = string.Empty;
+}

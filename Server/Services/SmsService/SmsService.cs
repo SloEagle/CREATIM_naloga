@@ -82,7 +82,7 @@ namespace CREATIM_naloga.Server.Services.SmsService
 
                 return new ServiceResponse<string>
                 {
-                    Message = $"Sent through {provider.Name}",
+                    Message = $"Sent through provider: {provider.Name}\r\nTo: {sms.To}\r\nFrom: {sms.From}\r\nBody: {sms.Body}",
                     Success = true
                 };
             }

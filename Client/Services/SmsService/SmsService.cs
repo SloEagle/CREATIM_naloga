@@ -5,10 +5,12 @@ namespace CREATIM_naloga.Client.Services.SmsService
     public class SmsService : ISmsService
     {
         private readonly HttpClient _http;
+        private readonly ILogger<SmsService> _logger;
 
-        public SmsService(HttpClient http)
+        public SmsService(HttpClient http, ILogger<SmsService> logger)
         {
             _http = http;
+            _logger = logger;
         }
 
         public Provider Provider { get; set; }
@@ -26,18 +28,16 @@ namespace CREATIM_naloga.Client.Services.SmsService
         {
             var response = await _http.PostAsJsonAsync($"api/sms/{groupId}", sms);
 
-            //Add logging
             var providerSent = (await response.Content.ReadFromJsonAsync<ServiceResponse<string>>()).Message;
-            Console.WriteLine(providerSent);
+            _logger.LogInformation(providerSent);
         }
 
         public async Task SendSMS(Sms sms)
         {
             var response = await _http.PostAsJsonAsync("api/sms", sms);
 
-            //Add logging
             var providerSent = (await response.Content.ReadFromJsonAsync<ServiceResponse<string>>()).Message;
-            Console.WriteLine(providerSent);
+            _logger.LogInformation(providerSent);
         }
     }
 }

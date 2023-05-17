@@ -4,6 +4,7 @@
 @inject ISmsService SmsService
 @inject NavigationManager NavigationManager
 @inject ILogger<User> Logger
+@inject IJSRuntime JSRuntime
 
 <h3>User</h3>
 
@@ -13,7 +14,7 @@
 }
 else
 {
-    <EditForm Model="UserService.User" OnSubmit="UpdateUser">
+    <EditForm Model="UserService.User" OnValidSubmit="UpdateUser">
         <DataAnnotationsValidator />
         <div class="row">
             <div class="mb-0">
@@ -53,26 +54,32 @@ else
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" @onclick="UpdateUser">
+        <button type="submit" class="btn btn-primary">
             <i class="oi oi-plus"></i> Save
         </button>
-        <button type="button" class="btn btn-primary" @onclick="SendSMS">
-            Send SMS through
-            @if (@SmsService.Provider == null)
-            {
-                <span>Loading...</span>
-            }
-            else
-            {
-                @SmsService.Provider.Name
-            }
+        <button type="button" class="btn btn-primary" @onclick="SendSMSTest">
+            Send SMS (provider testing)
         </button>
     </EditForm>
+
+    <br />
+
+    <SmsInput MessageBody="@SmsMessage" MessageFrom="@SmsFrom" @ref="smsInput"></SmsInput>
+
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="() => SendSMS(UserService.User)">
+        Send 
+    </button>
 }
 
 @code {
     [Parameter]
     public int Id { get; set; }
+
+    public string SmsMessage { get; set; } = "Input SMS body text here...";
+    public string SmsFrom { get; set; } = "Send from...";
+    SmsInput smsInput { get; set; } = new SmsInput();
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,6 +88,8 @@ else
             await UserService.GetUser(Id);
             await GroupService.GetGroups();
             await SmsService.GetProvider();
+
+            Logger.LogInformation("Data retrieved.");
         }
         catch (Exception ex)
         {
@@ -92,13 +101,17 @@ else
     {
         try
         {
-            if (Id == 0)
-            {
+            if (Id <= 0)
+        {
                 await UserService.AddUser(UserService.User);
+
+                Logger.LogInformation("User added.");
             }
             else
             {
                 await UserService.UpdateUser(UserService.User);
+
+                Logger.LogInformation("User updated.");
             }
 
             NavigationManager.NavigateTo("/users");
@@ -109,16 +122,46 @@ else
         }
     }
 
-    private async Task SendSMS()
+    private async Task SendSMSTest()
     {
-        var sms = new Sms()
-            {
-                To = "Jan",
-                From = "Peter",
-                Body = "Lorem Ipsum"
-            };
+        try
+        {
+            var sms = new Sms()
+                {
+                    To = "Jan",
+                    From = "Peter",
+                    Body = "Lorem Ipsum"
+                };
 
-        await SmsService.SendSMS(sms);
+            await SmsService.SendSMS(sms);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+        }
+    }
+
+    private async Task SendSMS(CREATIM_naloga.Shared.Models.User user)
+    {
+        try
+        {
+            var sms = new Sms()
+                {
+                    To = user.Name,
+                    From = smsInput.MessageFrom,
+                    Body = smsInput.MessageBody
+                };
+
+            await SmsService.SendSMS(sms);
+
+            Logger.LogInformation("SMS sent.");
+            await JSRuntime.InvokeVoidAsync("alert", $"SMS sent.");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+            await JSRuntime.InvokeVoidAsync("alert", $"SMS NOT sent.");
+        }
     }
 }
 

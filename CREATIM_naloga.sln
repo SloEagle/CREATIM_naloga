@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CREATIM_naloga.Server", "Server\CREATIM_naloga.Server.csproj", "{0973ABAD-4139-42B9-8DFE-885A21017692}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CREATIM_naloga.Server", "Server\CREATIM_naloga.Server.csproj", "{0973ABAD-4139-42B9-8DFE-885A21017692}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CREATIM_naloga.Client", "Client\CREATIM_naloga.Client.csproj", "{3F4956A3-8CC7-4922-9716-960167E77F05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CREATIM_naloga.Client", "Client\CREATIM_naloga.Client.csproj", "{3F4956A3-8CC7-4922-9716-960167E77F05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CREATIM_naloga.Shared", "Shared\CREATIM_naloga.Shared.csproj", "{B1E81E72-BB46-43AF-B4F2-CEA7E15DE9D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CREATIM_naloga.Shared", "Shared\CREATIM_naloga.Shared.csproj", "{B1E81E72-BB46-43AF-B4F2-CEA7E15DE9D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
