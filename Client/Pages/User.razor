@@ -1,4 +1,5 @@
 ﻿@page "/user/{id:int}"
+@using System.Linq.Expressions;
 @inject IUserService UserService
 @inject IGroupService GroupService
 @inject ISmsService SmsService
@@ -35,7 +36,7 @@ else
             </div>
             <div class="mb-0">
                 <label for="tax">Tax number</label>
-                <InputText id="tax" @bind-Value="UserService.User.TaxNumber" class="form-control"></InputText>
+                <InputText id="tax" @bind-Value="UserService.User.TaxNumber" class="form-control" disabled="@(!UserService.User.Bussiness)"></InputText>
             </div>
             <div class="mb-0">
                 <label for="group">Group</label>
@@ -51,7 +52,7 @@ else
         <button type="submit" class="btn btn-primary">
             <i class="oi oi-plus"></i> Save
         </button>
-        <button type="button" class="btn btn-primary" @onclick="SendSMSTest">
+        <button type="button" class="btn btn-primary" @onclick="() => SendSMSTest(UserService.User)">
             Send SMS (provider testing)
         </button>
         <ValidationSummary />
@@ -75,8 +76,6 @@ else
     public string SmsMessage { get; set; } = "Input SMS body text here...";
     public string SmsFrom { get; set; } = "Send from...";
     SmsInput smsInput { get; set; } = new SmsInput();
-
-    InputText taxField { get; set; } = new InputText();
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,15 +118,15 @@ else
         }
     }
 
-    private async Task SendSMSTest()
+    private async Task SendSMSTest(CREATIM_naloga.Shared.Models.User user)
     {
         try
         {
             var sms = new Sms()
                 {
-                    To = "Jan",
-                    From = "Peter",
-                    Body = "Lorem Ipsum"
+                    To = "Provider count test",
+                    From = smsInput.MessageFrom,
+                    Body = smsInput.MessageBody
                 };
 
             await SmsService.SendSMS(sms);

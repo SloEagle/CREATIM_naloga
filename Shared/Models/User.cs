@@ -21,7 +21,19 @@ namespace CREATIM_naloga.Shared.Models
         [Required(ErrorMessage = "Please enter a phone number.")]
         [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; } = string.Empty;
-        public bool Bussiness { get; set; } = false;
+        private bool _Bussiness;
+        public bool Bussiness
+        {
+            get => _Bussiness;
+            set
+            {
+                _Bussiness = value;
+                if (!_Bussiness)
+                {
+                    TaxNumber = string.Empty;
+                }
+            }
+        }
         [RequiredIf("Bussiness", true, ErrorMessage = "Tax number is required for bussiness accounts.")]
         [StringLengthIf("Bussiness", true, 8, 8, ErrorMessage = "Tax number must be 8 characters long.")]
         [RegularExpressionIf("Bussiness", true, @"^[0-9]*$", ErrorMessage = "Only input digits 0-9.")]
