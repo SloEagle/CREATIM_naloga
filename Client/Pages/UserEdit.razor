@@ -1,5 +1,4 @@
 ﻿@page "/user/{id:int}"
-@using System.Linq.Expressions;
 @inject IUserService UserService
 @inject IGroupService GroupService
 @inject ISmsService SmsService
@@ -9,7 +8,7 @@
 
 <h3>User</h3>
 
-@if (UserService.User == null)
+@if (UserService.User == null || GroupService.Groups == null)
 {
     <span>Loading...</span>
 }
@@ -48,6 +47,8 @@ else
                 </InputSelect>
             </div>
         </div>
+
+        <br />
 
         <button type="submit" class="btn btn-primary">
             <i class="oi oi-plus"></i> Save

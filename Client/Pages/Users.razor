@@ -7,6 +7,11 @@
 
 <h3>Users</h3>
 
+<SmsInput MessageBody="@SmsMessage" MessageFrom="@SmsFrom" @ref="smsInput"></SmsInput>
+
+<br />
+<br />
+
 <div class="header">
     <div class="col">Name</div>
     <div class="col">E-Mail</div>
@@ -71,8 +76,6 @@ else
     <button type="button" class="btn btn-primary" @onclick="AddUser">
         <i class="oi oi-plus"></i> Add user
     </button>
-
-    <SmsInput MessageBody="@SmsMessage" MessageFrom="@SmsFrom" @ref="smsInput"></SmsInput>
 }
 
 @code {

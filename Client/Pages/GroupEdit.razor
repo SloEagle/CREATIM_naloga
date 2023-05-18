@@ -1,0 +1,115 @@
+﻿@page "/group/{id:int}"
+@inject IGroupService GroupService
+@inject ISmsService SmsService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject ILogger<Groups> Logger
+
+<h3>Group</h3>
+
+@if (GroupService.Group == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+    <EditForm Model="GroupService.Group" OnValidSubmit="UpdateGroup">
+        <DataAnnotationsValidator />
+        <div class="row">
+            <div class="mb-0">
+                <label for="name">Name</label>
+                <InputText id="name" @bind-Value="GroupService.Group.Name" class="form-control"></InputText>
+            </div>
+        </div>  
+
+        <br />
+
+        <button type="submit" class="btn btn-primary">
+            <i class="oi oi-plus"></i> Save
+        </button>
+        <ValidationSummary />
+    </EditForm>
+
+    <br />
+
+    <SmsInput MessageBody="@SmsMessage" MessageFrom="@SmsFrom" @ref="smsInput"></SmsInput>
+
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="() => SendSMS(GroupService.Group.Id, GroupService.Group.Name)">
+        Send 
+    </button>
+
+
+    @code {
+        [Parameter]
+        public int Id { get; set; }
+
+        public string SmsMessage { get; set; } = "Input SMS body text here...";
+        public string SmsFrom { get; set; } = "Send from...";
+        SmsInput smsInput { get; set; } = new SmsInput();
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                await GroupService.GetGroup(Id);
+                await SmsService.GetProvider();
+
+                Logger.LogInformation("Data retrieved.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+            }
+        }
+
+        private async Task UpdateGroup()
+        {
+            try
+            {
+                if (Id <= 0)
+                {
+                await GroupService.AddGroup(GroupService.Group);
+
+                    Logger.LogInformation("Group added.");
+                }
+                else
+                {
+                await GroupService.UpdateGroup(GroupService.Group);
+
+                    Logger.LogInformation("Group updated.");
+                }
+
+                NavigationManager.NavigateTo("/groups");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+            }
+        }
+
+        private async Task SendSMS(int groupId, string groupName)
+        {
+            try
+            {
+                var sms = new Sms()
+                    {
+                        To = groupName,
+                        From = smsInput.MessageFrom,
+                        Body = smsInput.MessageBody
+                    };
+
+                await SmsService.SendGroupSMS(groupId, sms);
+
+                Logger.LogInformation("Group SMS sent.");
+                await JSRuntime.InvokeVoidAsync("alert", $"Group SMS sent.");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+                await JSRuntime.InvokeVoidAsync("alert", $"Group SMS NOT sent.");
+            }
+        }
+    }
+}

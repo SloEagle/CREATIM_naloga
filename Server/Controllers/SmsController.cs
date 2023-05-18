@@ -31,7 +31,7 @@ namespace CREATIM_naloga.Server.Controllers
         }
 
         [HttpPost("group/{groupId}")]
-        public async Task<ActionResult<ServiceResponse<string>>> SendSMS(int groupId, Sms sms)
+        public async Task<ActionResult<ServiceResponse<string>>> SendGroupSMS(int groupId, Sms sms)
         {
             var result = await _smsService.SendGroupSMS(groupId, sms);
             return Ok(result);

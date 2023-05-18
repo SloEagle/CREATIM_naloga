@@ -13,7 +13,8 @@ namespace CREATIM_naloga.Client.Services.GroupService
             _http = http;
         }
 
-        public List<Group> Groups { get; set; } = new List<Group>();
+        public List<Group> Groups { get; set; }
+        public Group Group { get; set; }
 
         public async Task AddGroup(Group group)
         {
@@ -25,6 +26,19 @@ namespace CREATIM_naloga.Client.Services.GroupService
         {
             var response = await _http.DeleteAsync($"api/group/{id}");
             Groups = (await response.Content.ReadFromJsonAsync<ServiceResponse<List<Group>>>()).Data;
+        }
+
+        public async Task GetGroup(int id)
+        {
+            var response = await _http.GetFromJsonAsync<ServiceResponse<Group>>($"api/group/{id}");
+            if (response != null && response.Data != null)
+            {
+                Group = response.Data;
+            }
+            else
+            {
+                Group = new Group();
+            }
         }
 
         public async Task GetGroups()

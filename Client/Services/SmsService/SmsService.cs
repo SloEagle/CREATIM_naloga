@@ -26,7 +26,7 @@ namespace CREATIM_naloga.Client.Services.SmsService
 
         public async Task SendGroupSMS(int groupId, Sms sms)
         {
-            var response = await _http.PostAsJsonAsync($"api/sms/{groupId}", sms);
+            var response = await _http.PostAsJsonAsync($"api/sms/group/{groupId}", sms);
 
             var providerSent = (await response.Content.ReadFromJsonAsync<ServiceResponse<string>>()).Message;
             _logger.LogInformation(providerSent);

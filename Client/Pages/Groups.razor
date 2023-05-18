@@ -1,10 +1,16 @@
 ﻿@page "/groups"
 @inject IGroupService GroupService
+@inject ISmsService SmsService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
-@inject Logger<Groups> Logger
+@inject ILogger<Groups> Logger
 
 <h3>Groups</h3>
+
+<SmsInput MessageBody="@SmsMessage" MessageFrom="@SmsFrom" @ref="smsInput"></SmsInput>
+
+<br />
+<br />
 
 <div class="header">
     <div class="col">Name</div>
@@ -25,7 +31,7 @@ else
                 @group.Name
             </div>
             <div class="col">
-                <button class="btn btn-primary" @onclick="(() => SendSMS())">
+                <button class="btn btn-primary" @onclick="(() => SendSMS(group.Id, group.Name))">
                     <i class="oi oi-envelope-open"></i>
                 </button>
             </div>
@@ -39,14 +45,24 @@ else
             </div>
         </div>
     }
+
+    <button type="button" class="btn btn-primary" @onclick="AddGroup">
+        <i class="oi oi-plus"></i> Add user
+    </button>
 }
 
 @code {
+    public string SmsMessage { get; set; } = "Input SMS body text here...";
+    public string SmsFrom { get; set; } = "Send from...";
+    SmsInput smsInput { get; set; } = new SmsInput();
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
             await GroupService.GetGroups();
+
+            Logger.LogInformation("Data retrieved.");
         }
         catch (Exception ex)
         {
@@ -67,6 +83,8 @@ else
             if (confirmed)
             {
                 await GroupService.DeleteGroup(group.Id);
+
+                Logger.LogInformation("Group deleted.");
             }
         }
         catch (Exception ex)
@@ -75,9 +93,32 @@ else
         }
     }
 
-    private async Task SendSMS()
+    private async Task SendSMS(int groupId, string groupName)
     {
-        await JSRuntime.InvokeVoidAsync("alert", $"SMS sent.");
+        try
+        {
+            var sms = new Sms()
+                {
+                    To = groupName,
+                    From = smsInput.MessageFrom,
+                    Body = smsInput.MessageBody
+                };
+
+            await SmsService.SendGroupSMS(groupId, sms);
+
+            Logger.LogInformation("Group SMS sent.");
+            await JSRuntime.InvokeVoidAsync("alert", $"Group SMS sent.");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.ToString());
+            await JSRuntime.InvokeVoidAsync("alert", $"Group SMS NOT sent.");
+        }
+    }
+
+    private void AddGroup()
+    {
+        NavigationManager.NavigateTo("/group/-1");
     }
 }
 

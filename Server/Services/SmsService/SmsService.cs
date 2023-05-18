@@ -37,9 +37,9 @@ namespace CREATIM_naloga.Server.Services.SmsService
             }
 
             return new ServiceResponse<string> 
-            { 
-                Success = true,
-                Message = "Group SMS sent"
+            {
+                Message = $"Sent Group SMS\r\nTo group: {groupId}\r\nFrom: {sms.From}\r\nBody: {sms.Body}",
+                Success = true
             };
         }
 

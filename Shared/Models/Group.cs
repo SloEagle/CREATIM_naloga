@@ -10,7 +10,6 @@ namespace CREATIM_naloga.Shared.Models
     public class Group
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "Please enter a group name.")]
         public string Name { get; set; } = string.Empty;
     }
 }
