@@ -48,7 +48,14 @@ else
                 @user.TaxNumber
             </div>
             <div class="col">
-                @user.Group.Name
+                @if (@user.Group == null)
+                {
+                    <span>No group</span>
+                }
+                else
+                {
+                    @user.Group.Name
+                }
             </div>
             <div class="col">
                 <button class="btn btn-primary" @onclick="(() => SendSMS(user))">
