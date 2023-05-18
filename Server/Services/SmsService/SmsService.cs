@@ -83,8 +83,8 @@ namespace CREATIM_naloga.Server.Services.SmsService
                         FROM Providers
                         WHERE SentCount >= 99
                     ) BEGIN
-                        INSERT INTO Providers (Name, SentCount)
-                        SELECT Name, 0
+                        INSERT INTO Providers (Name, SentCount, SID, Url)
+                        SELECT Name, 0, SID, Url
                         FROM Providers
                         WHERE Id = @TopProviderId;
 
