@@ -28,7 +28,7 @@ namespace CREATIM_naloga.Server.Services.SmsService
         public async Task<ServiceResponse<string>> SendGroupSMS(int groupId, Sms sms)
         {
             var users = await _context.Users
-                .Where(u => u.Group.Id == groupId)
+                .Where(u => u.GroupId == groupId)
                 .ToListAsync();
 
             foreach (var user in users)

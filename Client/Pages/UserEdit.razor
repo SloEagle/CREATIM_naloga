@@ -39,7 +39,7 @@ else
             </div>
             <div class="mb-0">
                 <label for="group">Group</label>
-                <InputSelect id="group" @bind-Value="UserService.User.Group.Id" class="form-control">
+                <InputSelect id="group" @bind-Value="UserService.User.GroupId" class="form-control">
                     @foreach (var group in GroupService.Groups)
                     {
                         <option value="@group.Id">@group.Name</option>

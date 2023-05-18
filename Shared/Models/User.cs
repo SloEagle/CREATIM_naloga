@@ -38,7 +38,8 @@ namespace CREATIM_naloga.Shared.Models
         [StringLengthIf("Bussiness", true, 8, 8, ErrorMessage = "Tax number must be 8 characters long.")]
         [RegularExpressionIf("Bussiness", true, @"^[0-9]*$", ErrorMessage = "Only input digits 0-9.")]
         public string TaxNumber { get; set; } = string.Empty;
-        public Group Group { get; set; } = new Group();
+        //public Group Group { get; set; } = new Group();
+        public int GroupId { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Property)]

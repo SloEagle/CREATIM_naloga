@@ -43,7 +43,6 @@ namespace CREATIM_naloga.Server.Services.UserService
         public async Task<ServiceResponse<User>> GetUser(int id)
         {
             var user = await _context.Users
-                .Include(u => u.Group)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if(user == null)
@@ -67,8 +66,7 @@ namespace CREATIM_naloga.Server.Services.UserService
         public async Task<ServiceResponse<List<User>>> GetUsers()
         {
             var users = await _context.Users
-                .Include(u => u.Group)
-                .OrderBy(u => u.Group)
+                .OrderBy(u => u.GroupId)
                 .ToListAsync();
 
             return new ServiceResponse<List<User>>
@@ -96,7 +94,7 @@ namespace CREATIM_naloga.Server.Services.UserService
                 dbUser.Data.PhoneNumber = user.PhoneNumber;
                 dbUser.Data.TaxNumber = user.TaxNumber;
                 dbUser.Data.Bussiness = user.Bussiness;
-                dbUser.Data.Group = user.Group;
+                dbUser.Data.GroupId = user.GroupId;
 
                 await _context.SaveChangesAsync();
 
