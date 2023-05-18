@@ -1,3 +1,5 @@
 1. Zaženite file "Skripta.sql" ki v MSSQL izdela in napolni 3 podatkovne tabelce (Users, Providers, Groups)
 2. V datoteki Server odprite "appsetting.json" in spremenite "DefaultConnection" povezavo in ime podatkovne baze kjer ste zagnali skripto.
 3. Zaženite program.
+
+PS. Vse je prikazano v priloženem videu.
