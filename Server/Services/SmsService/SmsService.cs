@@ -11,41 +11,67 @@ namespace CREATIM_naloga.Server.Services.SmsService
     {
         private readonly DataContext _context;
         private readonly IConfiguration _config;
+        private readonly ILogger<SmsService> _logger;
 
         public Sms Sms { get; set; }
 
-        public SmsService(DataContext context, IConfiguration config)
+        public SmsService(DataContext context, IConfiguration config, ILogger<SmsService> logger)
         {
             _context = context;
             _config = config;
+            _logger = logger;
         }
 
         public async Task<Provider> GetProvider()
         {
-            return await _context.Providers.FirstOrDefaultAsync();
+            try
+            {
+                return await _context.Providers.FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+
+                return new Provider();
+            }
         }
 
         public async Task<ServiceResponse<string>> SendGroupSMS(int groupId, Sms sms)
         {
-            var users = await _context.Users
+            try
+            {
+                var users = await _context.Users
                 .Where(u => u.GroupId == groupId)
                 .ToListAsync();
 
-            foreach (var user in users)
-            {
-                await SendSMS(sms);
-            }
+                foreach (var user in users)
+                {
+                    await SendSMS(sms);
+                }
 
-            return new ServiceResponse<string> 
+                return new ServiceResponse<string>
+                {
+                    Message = $"Sent Group SMS\r\nTo group: {groupId}\r\nFrom: {sms.From}\r\nBody: {sms.Body}",
+                    Success = true
+                };
+            }
+            catch (Exception ex)
             {
-                Message = $"Sent Group SMS\r\nTo group: {groupId}\r\nFrom: {sms.From}\r\nBody: {sms.Body}",
-                Success = true
-            };
+                _logger.LogError(ex.Message);
+
+                return new ServiceResponse<string>
+                {
+                    Message = $"Server side error: {ex.ToString()}",
+                    Success = false
+                };
+            }
         }
 
         public async Task<ServiceResponse<string>> SendSMS(Sms sms)
         {
-            var providers = await _context.Providers
+            try
+            {
+                var providers = await _context.Providers
                     .FromSqlRaw(@"
                     DECLARE @TopProviderId INT;
 
@@ -74,23 +100,34 @@ namespace CREATIM_naloga.Server.Services.SmsService
                     FROM Providers")
                     .ToListAsync();
 
-            if (providers.Count != 0)
-            {
-                var provider = providers[0];
-
-                SendSmsUsingProvider(provider, sms);
-
-                return new ServiceResponse<string>
+                if (providers.Count != 0)
                 {
-                    Message = $"Sent through provider: {provider.Name}\r\nTo: {sms.To}\r\nFrom: {sms.From}\r\nBody: {sms.Body}",
-                    Success = true
-                };
+                    var provider = providers[0];
+
+                    SendSmsUsingProvider(provider, sms);
+
+                    return new ServiceResponse<string>
+                    {
+                        Message = $"Sent through provider: {provider.Name}\r\nTo: {sms.To}\r\nFrom: {sms.From}\r\nBody: {sms.Body}",
+                        Success = true
+                    };
+                }
+                else
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Provider not found.",
+                        Success = false
+                    };
+                }
             }
-            else
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+
                 return new ServiceResponse<string>
                 {
-                    Message = "SMS not sent",
+                    Message = $"Server side error: {ex.ToString()}",
                     Success = false
                 };
             }
@@ -111,52 +148,66 @@ namespace CREATIM_naloga.Server.Services.SmsService
 
         private void RestCommand(Provider provider, Sms sms)
         {
-            var accountSid = provider.SID;
-            var authToken = _config.GetSection($"Providers:Tokens:{provider.Name}").Value;
-            var url = provider.Url;
-
-            using (var client = new HttpClient())
+            try
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountSid}:{authToken}")));
+                var accountSid = provider.SID;
+                var authToken = _config.GetSection($"Providers:Tokens:{provider.Name}").Value;
+                var url = provider.Url;
 
-                var values = new Dictionary<string, string>
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{accountSid}:{authToken}")));
+
+                    var values = new Dictionary<string, string>
                 {
                     { "To", sms.To },
                     { "From", sms.From },
                     { "Body", sms.Body }
                 };
 
-                var content = new FormUrlEncodedContent(values);
+                    var content = new FormUrlEncodedContent(values);
 
-                //Disabled (testing)
-                //var response = client.PostAsync(url, content).Result;
+                    //Disabled (testing)
+                    //var response = client.PostAsync(url, content).Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
             }
         }
 
         private void SoapCommand(Provider provider, Sms sms)
         {
-            var accountSid = provider.SID;
-            var authToken = _config.GetSection($"Providers:Tokens:{provider.Name}").Value;
-            var url = provider.Url;
-
-            var xml = new XElement(provider.Name,
-                new XElement("sendSms",
-                    new XElement("accountSid", accountSid),
-                    new XElement("authToken", authToken),
-                    new XElement("message",
-                        new XElement("to", sms.To),
-                        new XElement("from", sms.From),
-                        new XElement("body", sms.Body)
-                    )
-                )
-            );
-
-            using (var client = new HttpClient())
+            try
             {
-                var content = new StringContent(xml.ToString(), Encoding.UTF8, "application/xml");
+                var accountSid = provider.SID;
+                var authToken = _config.GetSection($"Providers:Tokens:{provider.Name}").Value;
+                var url = provider.Url;
 
-                //Disabled (testing)
-                //var response = client.PostAsync(url, content).Result;
+                var xml = new XElement(provider.Name,
+                    new XElement("sendSms",
+                        new XElement("accountSid", accountSid),
+                        new XElement("authToken", authToken),
+                        new XElement("message",
+                            new XElement("to", sms.To),
+                            new XElement("from", sms.From),
+                            new XElement("body", sms.Body)
+                        )
+                    )
+                );
+
+                using (var client = new HttpClient())
+                {
+                    var content = new StringContent(xml.ToString(), Encoding.UTF8, "application/xml");
+
+                    //Disabled (testing)
+                    //var response = client.PostAsync(url, content).Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
             }
         }
     }

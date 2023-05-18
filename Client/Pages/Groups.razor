@@ -6,6 +6,7 @@
 @inject ILogger<Groups> Logger
 
 <h3>Groups</h3>
+<PageTitle>Groups</PageTitle>
 
 <SmsInput MessageBody="@SmsMessage" MessageFrom="@SmsFrom" @ref="smsInput"></SmsInput>
 
@@ -47,7 +48,7 @@ else
     }
 
     <button type="button" class="btn btn-primary" @onclick="AddGroup">
-        <i class="oi oi-plus"></i> Add user
+        <i class="oi oi-plus"></i> Add group
     </button>
 }
 
