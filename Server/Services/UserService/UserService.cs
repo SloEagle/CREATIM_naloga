@@ -67,6 +67,7 @@ namespace CREATIM_naloga.Server.Services.UserService
         {
             var users = await _context.Users
                 .OrderBy(u => u.GroupId)
+                .Include(u => u.Group)
                 .ToListAsync();
 
             return new ServiceResponse<List<User>>
